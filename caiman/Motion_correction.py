@@ -25,10 +25,10 @@ def set_up_log():
 
 
 def select_files(path):
-    """Select one or multiple file(s)
+    """Select one or multiple file(s) and download them
 
-    :param path: The path of the file(s) selected
-    :return: The selected file
+    :param path: The url(s) of the file(s) selected
+    :return: The path of the downloaded file(s)
     """
     fnames = [download_demo(path)]
     return fnames
@@ -150,6 +150,7 @@ def setup_params(
                  'rf': rf,
                  'K': K,
                  'stride': stride_cnmf,
+                 'gSig': gSig,
                  'method_init': method_init,
                  'rolling_sum': True,
                  'only_init': True,
@@ -218,14 +219,16 @@ def memory_map(mc, border_to_0, dview):
     :param mc: The motion corrected object
     :param border_to_0:
     :param dview: expresses the cluster option
-    :return: The memory mapped variable reshaped
+    :return: images: The memory mapped variable reshaped
+             dims: the dimensions of the FOV
     """
     fname_new = cm.save_memmap(mc.mmap_file, base_name='memmap_', order='C',
                                border_to_0=border_to_0, dview=dview)  # exclude borders
     Yr, dims, T = cm.load_memmap(fname_new)
+
     images = np.reshape(Yr.T, [T] + list(dims), order='F')
 
-    return images
+    return images, dims
 
 
 def restart_cluster(dview):
@@ -269,9 +272,9 @@ def see_results(images, cnm):
     :param cnm: The result of the CNMF algorithm
     :return: An image of the contours of the identified ROIs
     """
-    Cn = cm.local_correlations(images.transpose(1, 2, 0))
-    Cn[np.isnan(Cn)] = 0
-    cnm.estimates.plot_contours(img=Cn)
+
+    cnm.estimates.plot_contours()
+    #cnm.estimates.view_components()
     plt.show(block=True)
 
 
@@ -323,9 +326,10 @@ if __name__ == "__main__":
 
     path = 'C:/Users/Martin/Documents/Onlab/Fmr1_KO_P9-P11_4Hz/Movie_1.tif'
     #path = 'Sue_2x_3000_40_-46.tif'
-
-
     fnames = select_files(path)
+
+
+
 
     #print("\n Showing basic plots...")
     #basic_plots(fnames)
@@ -340,9 +344,16 @@ if __name__ == "__main__":
     m_els, border_to_0 = NoRMCorre(mc)
     #print("\n Playing the original and the motion corrected movie...")
     #play_2_movies(fnames, m_els)
-    images = memory_map(mc, border_to_0, dview)
+    images, dims = memory_map(mc, border_to_0, dview)
+
+
     c, dview, n_processes = restart_cluster(dview)
     cnm = CNMF(n_processes, opts, dview, images)
+
+    cnm.estimates.detrend_df_f()
+    print(type(cnm.estimates.F_dff[0]))
+
+    """
     #print("\n Showing contours of found ROIs...")
     #see_results(images,cnm)
     cnm2 = seeded_cnmf(cnm, images, dview)
@@ -350,7 +361,7 @@ if __name__ == "__main__":
     stop_cluster(dview)
     #print("\n Showing contours of found ROIs after evaluation...")
     #see_results(images,cnm2)
-
+"""
     print("done")
 
 
