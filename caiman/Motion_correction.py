@@ -322,20 +322,13 @@ def stop_cluster(dview):
 if __name__ == "__main__":
 
     #set_up_log()
-
-
     path = 'C:/Users/Martin/Documents/Onlab/Fmr1_KO_P9-P11_4Hz/Movie_1.tif'
     #path = 'Sue_2x_3000_40_-46.tif'
     fnames = select_files(path)
-
-
-
-
     #print("\n Showing basic plots...")
     #basic_plots(fnames)
     #print("\n Showing correlation image...")
     #correlation_image(fnames)
-
     #print("\n playing the original movie...")
     #play_movie(fnames)
     opts = setup_params()      #parameterek
@@ -345,15 +338,8 @@ if __name__ == "__main__":
     #print("\n Playing the original and the motion corrected movie...")
     #play_2_movies(fnames, m_els)
     images, dims = memory_map(mc, border_to_0, dview)
-
-
     c, dview, n_processes = restart_cluster(dview)
     cnm = CNMF(n_processes, opts, dview, images)
-
-    cnm.estimates.detrend_df_f()
-    print(type(cnm.estimates.F_dff[0]))
-
-    """
     #print("\n Showing contours of found ROIs...")
     #see_results(images,cnm)
     cnm2 = seeded_cnmf(cnm, images, dview)
@@ -361,7 +347,6 @@ if __name__ == "__main__":
     stop_cluster(dview)
     #print("\n Showing contours of found ROIs after evaluation...")
     #see_results(images,cnm2)
-"""
     print("done")
 
 
