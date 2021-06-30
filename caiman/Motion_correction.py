@@ -14,7 +14,7 @@ from caiman.utils.visualization import plot_contours, view_patches, plot_contour
 
 
 def set_up_log():
-    """Create a log
+    """Create a log for the warnings occurring during running
 
     :return:
     """
@@ -327,23 +327,29 @@ if __name__ == "__main__":
 
     fnames = select_files(path)
 
+    #print("\n Showing basic plots...")
     #basic_plots(fnames)
+    #print("\n Showing correlation image...")
     #correlation_image(fnames)
 
+    #print("\n playing the original movie...")
     #play_movie(fnames)
     opts = setup_params()      #parameterek
     c, dview, n_processes = setup_cluster()
     mc = MotionCorrect(fnames, dview=dview, **opts.get_group('motion'))     #create a motion correction object with the specified parameters
     m_els, border_to_0 = NoRMCorre(mc)
+    #print("\n Playing the original and the motion corrected movie...")
     #play_2_movies(fnames, m_els)
     images = memory_map(mc, border_to_0, dview)
     c, dview, n_processes = restart_cluster(dview)
     cnm = CNMF(n_processes, opts, dview, images)
-    see_results(images,cnm)
+    #print("\n Showing contours of found ROIs...")
+    #see_results(images,cnm)
     cnm2 = seeded_cnmf(cnm, images, dview)
     cnm2 = comp_eval(cnm2, images, dview)
     stop_cluster(dview)
-    see_results(images,cnm2)
+    #print("\n Showing contours of found ROIs after evaluation...")
+    #see_results(images,cnm2)
 
     print("done")
 
