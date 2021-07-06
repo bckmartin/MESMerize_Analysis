@@ -4,13 +4,14 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import matplotlib as mpl
 
 import caiman as cm
 from caiman.motion_correction import MotionCorrect
 from caiman.source_extraction.cnmf import cnmf as cnmf
 from caiman.source_extraction.cnmf import params as params
 from caiman.utils.utils import download_demo
-from caiman.utils.visualization import plot_contours, view_patches, plot_contours
+from caiman.utils.visualization import plot_contours, view_patches, plot_contours, get_contours
 
 
 def set_up_log():
@@ -340,6 +341,7 @@ if __name__ == "__main__":
     images, dims = memory_map(mc, border_to_0, dview)
     c, dview, n_processes = restart_cluster(dview)
     cnm = CNMF(n_processes, opts, dview, images)
+    
     #print("\n Showing contours of found ROIs...")
     #see_results(images,cnm)
     cnm2 = seeded_cnmf(cnm, images, dview)
@@ -347,6 +349,22 @@ if __name__ == "__main__":
     stop_cluster(dview)
     #print("\n Showing contours of found ROIs after evaluation...")
     #see_results(images,cnm2)
+
+    cnm2.estimates.plot_contours()
+    plt.show(block=True)
+    cnm.estimates.detrend_df_f()
+
+    fig, axs = plt.subplots(2, 2)
+    axs[0, 0].plot(cnm.estimates.F_dff[0])
+    axs[0, 0].set_title('normalized sn of comp 1')
+    axs[0, 1].plot(cnm.estimates.F_dff[1])
+    axs[0, 1].set_title('normalized sn of comp 2')
+    axs[1, 0].plot(cnm.estimates.F_dff[2])
+    axs[1, 0].set_title('normalized sn of comp 3')
+    axs[1, 1].plot(cnm.estimates.F_dff[3])
+    axs[1, 1].set_title('normalized sn of comp 4')
+    plt.show(block=True)
+
     print("done")
 
 

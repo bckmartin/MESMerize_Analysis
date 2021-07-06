@@ -27,7 +27,7 @@ def averaging(signal_list):
     """
     #check if their length match
     N = len(signal_list)-1
-    len_0 = len(singal_list[0])
+    len_0 = len(signal_list[0])
     i = 1
     while (i <= N):
         if (len_0 == len(signal_list[i])):
@@ -46,5 +46,23 @@ def averaging(signal_list):
             avg_arr[i] = sum/len(signal_list)
     else:
         print("The signals should be uniform in length")
+        avg_arr = None
 
     return avg_arr
+
+def slice_n(Arr, n):
+    """Check if the numpy array can be sliced up into n long arrays then slice them up and store
+        store them in a list.
+
+    :param Arr: The numpy array to be sliced up into n long pieces.
+    :param n: The length of the result arrays.
+    :return: A list of the sliced up arrays.
+    """
+    if (Arr.shape[0] % n) == 0:
+        Lst = []
+        N = int(Arr.shape[0] / n)
+        for i in range(N+1):
+            tmp_arr = Arr[0+i-1:n+i-1]
+            Lst.append(tmp_arr)
+        Lst = Lst[1:10]
+    return Lst
