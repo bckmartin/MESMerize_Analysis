@@ -23,7 +23,7 @@ def averaging(signal_list):
     The plots need to be the same length
 
     :param signal_list: The list containing the plots that should be averaged
-    :return: The average plot
+    :return: The averaged array
     """
     #check if their length match
     N = len(signal_list)-1
@@ -60,9 +60,24 @@ def slice_n(Arr, n):
     """
     if (Arr.shape[0] % n) == 0:
         Lst = []
-        N = int(Arr.shape[0] / n)
-        for i in range(N+1):
-            tmp_arr = Arr[0+i-1:n+i-1]
+        stim_rep = int(Arr.shape[0] / n)
+        for i in range(stim_rep):
+            tmp_arr = Arr[i * n:i * n + n]
             Lst.append(tmp_arr)
-        Lst = Lst[1:10]
     return Lst
+
+def averaging_2(Arr, stim_len):
+    """Check if the numpy array can be sliced up into stim_len long arrays then average them.
+
+    :param Arr: The numpy array to be averaged on stim_len long stimuli repetitions.
+    :param stim_len: The length of one stimulus.
+    :return: The averaged array
+    """
+    l = Arr.shape[0]
+    if (Arr.shape[0] % stim_len) == 0:
+        stim_rep = l/stim_len
+        Arr_sum = np.zeros(stim_len)
+        for i in range(int(stim_len)):
+            Arr_sum[i] = Arr[i::stim_len].sum()
+
+    return Arr_sum/stim_rep
