@@ -81,3 +81,46 @@ def averaging_2(Arr, stim_len):
             Arr_sum[i] = Arr[i::stim_len].sum()
 
     return Arr_sum/stim_rep
+
+def averaging_by_frames(Arr, start_frames):
+    #make an list of arrays from the start frames
+    stim_lst = []
+    for i in range(start_frames.shape[0]-1):
+        stim_lst.append(Arr[start_frames[i]:start_frames[i+1]])
+    stim_lst.append(Arr[start_frames[-1]:])
+
+
+
+    #filter the ones that dont fit the criteria
+    arr_lengths= []
+    for i in stim_lst:
+        arr_lengths.append(i.shape[0])
+    arr_lengths = np.array(arr_lengths)
+    med = np.median(arr_lengths)
+    new_lst = []
+    for i in range(len(arr_lengths)):
+        if arr_lengths[i] > 0.9* med:
+            new_lst.append(stim_lst[i])
+
+
+    #average on the longest arr frame by frame
+    max = 0
+    for i in range(len(new_lst)):
+        if new_lst[i].shape[0] > max:
+            max_idx = i
+            max = len(new_lst[i])
+    res_arr = np.zeros(max)
+    for i in range(max):
+        sum = 0
+        good = 0
+        for j in range(len(new_lst)):
+            try:
+                sum = sum + new_lst[j][i]
+                good = good + 1
+                #break
+            except ValueError:
+                print("Oops")
+        res_arr[i] = sum/good
+    return  res_arr
+
+
