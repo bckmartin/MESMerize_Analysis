@@ -82,12 +82,11 @@ def averaging_2(Arr, stim_len):
 
     return Arr_sum/stim_rep
 
-def averaging_by_frames(Arr, start_frames):
-    #make an list of arrays from the start frames
+def averaging_by_frames(Arr, start_frames, end_frames):
+    #make a list of arrays from the start frames
     stim_lst = []
-    for i in range(start_frames.shape[0]-1):
-        stim_lst.append(Arr[start_frames[i]:start_frames[i+1]])
-    stim_lst.append(Arr[start_frames[-1]:])
+    for i in range(start_frames.shape[0]):
+        stim_lst.append(Arr[start_frames[i]:end_frames[i]])
 
 
 
