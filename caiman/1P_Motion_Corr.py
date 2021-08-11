@@ -16,25 +16,22 @@ import matplotlib.pyplot as plt
 import cv2
 
 if __name__ == "__main__":
-    original_stdout = sys.stdout
-    with open('C:/Users/Martin/Desktop/Motion_correction_for/Motion_correction_offsets.txt', 'w') as f:
-        sys.stdout = f
-        my_lst = ['E:/Data/Experiment/2021/08.03/data/20210803-111355-Fluorescent-recording.tif',
-                  'E:/Data/Experiment/2021/08.03/data/20210803-111641-Fluorescent-recording.tif',
-                  'E:/Data/Experiment/2021/08.03/data/20210803-111820-Fluorescent-recording.tif',
-                  'E:/Data/Experiment/2021/08.03/data/20210803-123810-Fluorescent-recording.tif',
-                  'E:/Data/Experiment/2021/08.03/data/20210803-124444-Fluorescent-recording.tif',
-                  'E:/Data/Experiment/2021/08.03/data/20210803-124546-Fluorescent-recording.tif']
-        name_lst = ['C:/Users/Martin/Desktop/Motion_correction_for/3recording.png',
-                    'C:/Users/Martin/Desktop/Motion_correction_for/4recording.png',
-                    'C:/Users/Martin/Desktop/Motion_correction_for/5recording.png',
-                    'C:/Users/Martin/Desktop/Motion_correction_for/6recording.png',
-                    'C:/Users/Martin/Desktop/Motion_correction_for/7recording.png',
-                    'C:/Users/Martin/Desktop/Motion_correction_for/8recording.png']
-        for x in range(len(my_lst)):
+    #original_stdout = sys.stdout
+    #with open('C:/Users/Martin/Desktop/Motion_correction_for/Motion_correction_offsets.txt', 'w') as f:
+        #sys.stdout = f
+        my_lst = ['/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-110946-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-111139-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-111355-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-111641-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-111820-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-123810-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-124444-Fluorescent-recording.tif',
+                  '/media/hillierlab/T7/Data/Experiment/2021/08.03/data/20210803-124546-Fluorescent-recording.tif'
+                  ]
+
+        for x in range(8):
             path = my_lst[x]
-            print(x+3,". recording\n")
-            #download data and convert to single precision
+            print(x+1,". recording\n")
             fnames = [download_demo(path)]
             #set up clusters for parallel processing
             if 'dview' in locals():
@@ -74,28 +71,42 @@ if __name__ == "__main__":
             if motion_correct:
                 # do motion correction rigid
                 mc = MotionCorrect(fnames, dview=dview, **opts.get_group('motion'))
-                mc.motion_correct()
+                mc.motion_correct(save_movie=True)
                 fname_mc = mc.fname_tot_els if pw_rigid else mc.fname_tot_rig
 
-                x_axis_elements = [x_shift[0] for x_shift in mc.shifts_rig]
-                y_axis_elements = [y_shift[1] for y_shift in mc.shifts_rig]
-
+                #x_axis_elements = [x_shift[0] for x_shift in mc.shifts_rig]
+                #y_axis_elements = [y_shift[1] for y_shift in mc.shifts_rig]
+                """
                 print("Max x oriented shift(px): ", np.max(x_axis_elements))
                 print("Max y oriented shift(px)? ", np.max(y_axis_elements))
 
                 print("Min x oriented shift(px): ", np.min(x_axis_elements))
                 print("Min y oriented shift(px)? ", np.min(y_axis_elements), "\n\n")
+                """
 
+                #tmp_filename_x = "x_direction_offset_for_" + str(x) + ".recordnig.png"
+                #tmp_filename_y = "y_direction_offset_for_" + str(x) + ".recordnig.png"
 
-
-                fig = plt.figure()
-                plt.plot(mc.shifts_rig)  # % plot rigid shifts
-                plt.legend(['x shifts', 'y shifts'])
+                """
+                x_fig = plt.figure()
+                plt.plot(x_axis_elements)  # % plot rigid shifts
+                plt.legend('x shifts')
                 plt.xlabel('frames')
                 plt.ylabel('pixels')
                 #plt.show(block=True)
-                plt.savefig(name_lst[x])
-        sys.stdout = original_stdout
+                plt.savefig(tmp_filename_x)
+
+                y_fig = plt.figure()
+                plt.plot(y_axis_elements)  # % plot rigid shifts
+                plt.legend('y shifts')
+                plt.xlabel('frames')
+                plt.ylabel('pixels')
+                # plt.show(block=True)
+                plt.savefig(tmp_filename_y)
+                """
+                tmp_movie_name = str(x+1) + ".recording_motion_corrected.tif"
+                cm.load(mc.mmap_file).save(tmp_movie_name)
+        #sys.stdout = original_stdout
 
 
 
