@@ -100,7 +100,7 @@ def motion_correction(save_movie):
     """
 
     mc = MotionCorrect(fnames, dview=dview, **opts.get_group('motion'))
-    mc.motion_correct(save_movie=save_movie)
+    mc.motion_correct()
 
     return mc
 
@@ -114,8 +114,9 @@ def play_movie():
     bord_px = 0 if border_nan is 'copy' else bord_px
     if save_movie_mmap:
         fname_new = cm.save_memmap(fname_mc, base_name='memmap_', order='C', border_to_0=bord_px)
-    if save_movie_tif:           #search for the saving template
-        cm.load(mc.mmap_file).save(tmp_movie_name)
+    if save_movie_tif: #search for the saving template
+        save_name = mc.fname_tot_rig
+        cm.load(mc.mmap_file).save()
 
 def show_motion_corr_movie():
 
