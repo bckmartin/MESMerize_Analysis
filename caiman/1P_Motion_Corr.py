@@ -1,9 +1,6 @@
-# demo file for applying the NoRMCorre motion correction algorithm on
-# 1 - photon widefield imaging data
-# Example file is provided from the miniscope project page
-# www.miniscope.org
-import sys
 
+
+import sys
 import numpy as np
 import caiman as cm
 from caiman.source_extraction import cnmf
@@ -14,6 +11,127 @@ from caiman.source_extraction.cnmf import params as params
 from caiman.utils.visualization import plot_contours, nb_view_patches, nb_plot_contour
 import matplotlib.pyplot as plt
 import cv2
+
+import json
+
+def read_params(filename):
+    """
+    Read the parameters of the motion correction from a json file, convert the json arrays to tuples, add the 'fnames' parameter and pass down the dictionary to a 'CNMFparams' object
+
+    Parameters
+    ----------
+    filename : str
+    The location of the json file containing the parameters
+
+    Returns
+    -------
+    The function returns a 'CNMFparams' object containing the motion correction parameters
+    """
+    f = open(filename, 'r')
+    mc_dict = json.load(f)
+    f.close()
+    for key in mc_dict:
+        if isinstance(mc_dict[key], list):
+            mc_dict[key] = totuple(mc_dict[key])
+    mc_dict["fnames"] = fnames
+    opts = params.CNMFParams(params_dict=mc_dict)
+
+    return opts
+
+
+def totuple(arr):
+    """
+    Try to turn the input into a tuple
+
+    Parameters
+    ----------
+    arr : optional
+    The object we try to turn into a tupple
+
+    Returns
+    -------
+    The function either returns the original input or the input in tupple format depending on if we succeeded in converting the input into a tupple
+    """
+    try:
+        return tuple(totuple(f) for f in arr)
+    except TypeError:
+        return arr
+
+def set_up_cluster():
+    """
+    Start a cluster for parallel processing, if a cluster is already used it will be closed and a new session will be opened
+
+    To enable parallel processing a (local) cluster needs to be set up. If dview = dview is used
+    in the downstream analysis then parallel processing will be applied, if dview = None is used then
+    no parallel processing will be employed.
+
+    Returns
+    -------
+    dview
+        expresses the cluster option
+
+    n_processes
+        number of workers in dview
+
+    c
+        iparallel.Client object, only used when backend is not 'local'
+    """
+    if 'dview' in locals():
+        cm.stop_server(dview=dview)
+    c, dview, n_processes = cm.cluster.setup_cluster(backend='local',
+                                                     n_processes=None,
+                                                     single_thread=False)
+
+    return c, dview, n_processes
+
+
+def motion_correction(save_movie):
+    """
+    Perform motion correction
+    Parameters
+    ----------
+    save_movie
+        Flag to save the correction matrix in a mmap file
+
+    Returns
+    -------
+    mc
+        The motion correction object
+    """
+
+    mc = MotionCorrect(fnames, dview=dview, **opts.get_group('motion'))
+    mc.motion_correct(save_movie=save_movie)
+
+    return mc
+
+
+def play_movie():
+    #save template?
+    #show movies
+
+    fname_mc = mc.fname_tot_els if pw_rigid else mc.fname_tot_rig
+    bord_px = np.ceil(np.max(np.abs(mc.shifts_rig))).astype(np.int)
+    bord_px = 0 if border_nan is 'copy' else bord_px
+    if save_movie_mmap:
+        fname_new = cm.save_memmap(fname_mc, base_name='memmap_', order='C', border_to_0=bord_px)
+    if save_movie_tif:           #search for the saving template
+        cm.load(mc.mmap_file).save(tmp_movie_name)
+
+def show_motion_corr_movie():
+
+
+
+def show_plots():
+
+
+
+def show_min_max_shifts():
+
+
+
+def save_mmap():
+
+
 
 if __name__ == "__main__":
     #original_stdout = sys.stdout

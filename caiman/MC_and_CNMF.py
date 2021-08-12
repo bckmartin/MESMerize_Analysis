@@ -170,7 +170,7 @@ def setup_params(
 
 
 def setup_cluster():
-    """Srart a cluster for parallel processing, if a cluster is already used it will be closed and a new session will be opened
+    """Start a cluster for parallel processing, if a cluster is already used it will be closed and a new session will be opened
 
     To enable parallel processing a (local) cluster needs to be set up. If dview = dview is used
     in the downstream analysis then parallel processing will be applied, if dview = None is used then
